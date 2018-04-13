@@ -25,6 +25,7 @@ def regErr(dataset):
     return np.var(dataset[:,-1] * np.shape(dataset)[0])
 
 class CART(object):
+    tree = None
     def binSplitDataSet(self, dataset, feature, val):
         data1 = dataset[np.nonzero(dataset[:, feature] > val)[0], :]
         data2 = dataset[np.nonzero(dataset[:, feature] <= val)[0], :]
@@ -67,6 +68,22 @@ class CART(object):
             return None, leafType(dataset)
         return bestIndex, bestValue
 
+    def fit(self, dataset, leafType = regLeaf, errType = regErr, ops=(1, 4) ):
+        self.tree = self.createTree(dataset, leafType, errType, ops)
+
+    def predict(self, testData):
+        y_pred = []
+        for item in testData:
+            node = self.tree
+            while isinstance(node, TreeNode):
+                if item[node.featureToSplitOn] > node.valOfSplit:
+                    node = node.left
+                else:
+                    node = node.right
+            y_pred.append(node)
+        return y_pred
+
+
 if __name__ == '__main__':
     # testMat = np.mat(np.eye(4))
     # cart = CART()
@@ -80,6 +97,9 @@ if __name__ == '__main__':
     target = lb.target.reshape((-1 ,1))
     dataset = np.mat(np.hstack((data, target)))
     cart = CART()
-    tree = cart.createTree(dataset)
-    print(tree.featureToSplitOn)
-    print(tree.valOfSplit)
+    cart.fit(dataset)
+
+    testData = data[0:50,:]
+    y_pred = cart.predict(testData)
+    for i in range(len(y_pred)):
+        print(target[i,-1], y_pred[i])
