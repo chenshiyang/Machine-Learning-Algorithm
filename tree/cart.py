@@ -99,7 +99,7 @@ if __name__ == '__main__':
     cart = CART()
     cart.fit(dataset)
 
-    # testData = data[0:50,:]
+    testData = data[0:5,:]
     y_pred = cart.predict(testData)
     for i in range(len(y_pred)):
         print(target[i,-1], y_pred[i])
