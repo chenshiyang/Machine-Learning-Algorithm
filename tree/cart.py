@@ -73,8 +73,8 @@ class CART(object):
 
     def predict(self, testData):
         y_pred = []
+        node = self.tree
         for item in testData:
-            node = self.tree
             while isinstance(node, TreeNode):
                 if item[node.featureToSplitOn] > node.valOfSplit:
                     node = node.left
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     cart = CART()
     cart.fit(dataset)
 
-    testData = data[0:50,:]
+    # testData = data[0:50,:]
     y_pred = cart.predict(testData)
     for i in range(len(y_pred)):
         print(target[i,-1], y_pred[i])
