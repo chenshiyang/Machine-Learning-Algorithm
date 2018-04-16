@@ -73,16 +73,57 @@ class CART(object):
 
     def predict(self, testData):
         y_pred = []
-        node = self.tree
         for item in testData:
+            node = self.tree
             while isinstance(node, TreeNode):
-                if item[node.featureToSplitOn] > node.valOfSplit:
+                if item[0, node.featureToSplitOn] > node.valOfSplit:
                     node = node.left
                 else:
                     node = node.right
             y_pred.append(node)
         return y_pred
 
+
+    def isTree(self, node):
+        return isinstance(node, TreeNode)
+
+    def getMean(self, tree):
+        if self.isTree(tree.left):
+            tree.left = self.getMean(tree.left)
+        if self.isTree(tree.right):
+            tree.right = self.getMean(tree.right)
+        return (tree.left + tree.right ) / 2.0
+
+    def prune(self, tree, testData):
+        '''
+        后剪枝方法
+        采用递归的方式.
+        :param tree:
+        :param testData:
+        :return:
+        '''
+        # 如果该分支中,没有数据,则将其剪掉
+        if np.shape(testData)[0] == 0:
+            return self.getMean(tree)
+        if self.isTree(tree.left) or self.isTree(tree.right):
+            ldata, rdata = self.binSplitDataSet(testData, tree.featureToSplitOn, tree.valOfSplit)
+        if self.isTree(tree.left):
+            tree.left = self.prune(tree.left, ldata)
+        if self.isTree(tree.right):
+            tree.right = self.prune(tree.right, rdata)
+        if not self.isTree(tree.left) and not self.isTree(tree.right):
+            ldata, rdata = self.binSplitDataSet(testData, tree.featureToSplitOn, tree.valOfSplit)
+            errorNoMerge = np.sum(np.power(ldata[:, -1] - tree.left, 2)) + \
+                np.sum(np.power(rdata[:, -1] - tree.right, 2))
+
+            treeMean = (tree.left + tree.right) / 2.0
+            errorMerge = np.sum(np.power(treeMean - testData[:, -1], 2))
+            if errorMerge < errorNoMerge:
+                print("Merging")
+                return treeMean
+            else:
+                return tree
+        return tree
 
 if __name__ == '__main__':
     # testMat = np.mat(np.eye(4))
@@ -96,10 +137,20 @@ if __name__ == '__main__':
     data = lb.data.reshape((np.shape(lb.data)[0], -1))
     target = lb.target.reshape((-1 ,1))
     dataset = np.mat(np.hstack((data, target)))
+    train = dataset[0 : -20, :]
+    test = dataset[-20 : -10, :]
+    validate = dataset[-20:, :]
     cart = CART()
-    cart.fit(dataset)
+    cart.fit(train)
 
     testData = data[0:5,:]
-    y_pred = cart.predict(testData)
+    y_pred = cart.predict(validate)
     for i in range(len(y_pred)):
-        print(target[i,-1], y_pred[i])
+        print(target[-20 + i,-1], y_pred[i])
+
+    #剪枝
+    cart.prune(cart.tree, test)
+    cart.predict(validate)
+    print('*' * 50)
+    for i in range(len(y_pred)):
+        print(target[-20 + i,-1], y_pred[i])
