@@ -101,5 +101,45 @@ def createTree(dataSet, labels):
         tree[bestFeatureLabel][val] = createTree(splitDataSet(dataSet, bestFeature, val), subLabels)
     return tree
 
+def classify(tree, featureLabels, testVec):
+    '''
+    根据训练好的树tree,预测样本testVec的类别
+    :param tree:
+    :param featureLabels:
+    :param testVec:
+    :return:
+    '''
+    while(type(tree).__name__ == 'dict'):
+        featureName = list(tree.keys())[0]
+        featureVals = tree[featureName]
+        featureIndex = featureLabels.index(featureName)
+        for key in featureVals.keys():
+            if key == testVec[featureIndex]:
+                tree = featureVals[key]
+    return tree
+
+def storeTree(tree, fileName):
+    '''
+    将决策树以字节的方式持久化到本地文件中
+    :param tree:
+    :param fileName:
+    :return:
+    '''
+    import pickle
+    f = open(fileName, 'wb')
+    pickle.dump(tree, f)
+    f.close()
+
+def getTree(fileName):
+    '''
+    以字节读取的方式从本地文件中恢复决策树
+    :param fileName:
+    :return:
+    '''
+    import pickle
+    with open(fileName, 'rb') as f:
+        tree = pickle.load(f)
+        return tree
+
 if __name__ == '__main__':
     pass

@@ -69,6 +69,7 @@ def plotTree(myTree, parentPt, nodeTxt):
             plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))
     plotTree.yOff = plotTree.yOff + 1.0/plotTree.totalD
 
+
 def createPlot(inTree):
     fig = plt.figure(1, facecolor='white')
     fig.clf()
