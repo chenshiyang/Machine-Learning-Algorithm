@@ -7,23 +7,23 @@ from math import exp, log
 from gbdt.tree import construct_decision_tree
 
 
-class RegressionLossFunction(metaclass=ABCMeta):
+class RegressionLossFunction(object):
     def __init__(self, n_classes):
         self.K = n_classes
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def compute_residual(self, dataset, subset, f):
         """计算残差"""
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def update_f_value(self, f, tree, leaf_nodes, subset, dataset, learn_rate, label=None):
         """更新F_{m-1}的值"""
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def initialize(self, f, dataset):
         """初始化F_{0}的值"""
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def update_ternimal_regions(self, targets, idset):
         """更新叶子节点的返回值"""
 
@@ -59,28 +59,34 @@ class LeastSquaresError(RegressionLossFunction):
             f[id] = 0.0
 
     def update_ternimal_regions(self, targets, idset):
+        '''
+        节点的预测值为该节点中所有样本labe值的均值
+        :param targets:
+        :param idset:
+        :return:
+        '''
         sum1 = sum([targets[id] for id in idset])
         return sum1/len(idset)
 
 
-class ClassificationLossFunction(metaclass=abc.ABCMeta):
+class ClassificationLossFunction(object):
     """分类损失函数的基类"""
     def __init__(self, n_classes):
         self.K = n_classes
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def compute_residual(self, dataset, subset, f):
         """计算残差"""
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def update_f_value(self, f, tree, leaf_nodes, subset, dataset, learn_rate, label=None):
         """更新F_{m-1}的值"""
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def initialize(self, f, dataset):
         """初始化F_{0}的值"""
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def update_ternimal_regions(self, targets, idset):
         """更新叶子节点的返回值"""
 
@@ -196,7 +202,7 @@ class GBDT:
                 # 用损失函数的负梯度作为回归问题提升树的残差近似值
                 residual = self.loss.compute_residual(dataset, subset, f)
                 for label in label_valueset:
-                    # 挂在叶子节点下的各种样本,只有到迭代的max-depth才会使用
+                    # 挂在叶子节点下的各种样本,只有到迭代的max-depth才会真正把样本分配到叶节点中并生成叶子节点
                     # 存放的各个叶子节点，注意叶子节点存放的是各个条件下的样本集点
                     leaf_nodes = []
                     targets = {}
