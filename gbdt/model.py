@@ -1,12 +1,13 @@
 # -*- coding:utf-8 -*-
 from datetime import datetime
 import abc
+from abc import ABCMeta
 from random import sample
 from math import exp, log
 from gbdt.tree import construct_decision_tree
 
 
-class RegressionLossFunction(metaclass=abc.ABCMeta):
+class RegressionLossFunction(metaclass=ABCMeta):
     def __init__(self, n_classes):
         self.K = n_classes
 
