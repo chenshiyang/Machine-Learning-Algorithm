@@ -5,13 +5,17 @@
 Naive Bayes
 
 # gbdt
-GBDT算法,支持回归,二分类,多分类
+- GBDT算法,支持回归,二分类,多分类
 
 # linearmodel
-LR 逻辑回归
-PLA 感知机
+- LR 逻辑回归
+- PLA 感知机
+
+# randomforest
+- 随机森林算法
 
 # tree
-CART 分类回归树
-ID3 id3决策树
+- CART 分类回归树
+- ID3 id3决策树
+
 
