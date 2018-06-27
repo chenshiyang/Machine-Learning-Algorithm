@@ -5,12 +5,13 @@ class RandomForest(object):
     """A random forest object with the default of using a C45Tree 
     for each of the trees in the random forest. To train the forest
     create an instance of it then call train on a TraingData object"""
+
     def __init__(self, data, numberOfTrees=100):
         '''
         Initialize the random forest. 
         Each tree has a bag of the data associated with it.
         '''
-        self.data = data    #The data that the trees will be trained on
+        self.data = data  # The data that the trees will be trained on
         self.numberOfTrees = numberOfTrees
         self.forest = []
 
@@ -31,9 +32,9 @@ class RandomForest(object):
         Using vote to get the predicted label
         '''
 
-        #Create an empty dictionary
+        # Create an empty dictionary
         votes = {}
-        #Tally the votes, for each tree classify the sample
+        # Tally the votes, for each tree classify the sample
         for tree in self.forest:
             label = tree.classify(sample)
             if label in votes:
@@ -43,11 +44,11 @@ class RandomForest(object):
 
         bestLabel = None
         mostTimes = 0
-        #Find the label with the most votes
+        # Find the label with the most votes
         for key in votes:
             if votes[key] > mostTimes:
                 bestLabel = key
                 mostTimes = votes[key]
 
-        #Return the most popular label
-        return bestLabel      
+        # Return the most popular label
+        return bestLabel

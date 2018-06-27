@@ -5,10 +5,11 @@ import sys
 
 class TreeNode:
     """docstring for treeNode"""
+
     def __init__(self, dataSet, featureList, parent=None):
-        self.featureNumber = None  #分裂选择的特征
-        self.featureList = featureList 
-        self.threshold = None     #特征的分裂点
+        self.featureNumber = None  # 分裂选择的特征
+        self.featureList = featureList
+        self.threshold = None  # 特征的分裂点
         self.leftChild = None
         self.rightChild = None
         self.dataSet = dataSet
@@ -32,16 +33,16 @@ class TreeNode:
         6. Recur on the sublists obtained by splitting on a_best, and add those nodes as children of node
         '''
 
-        #Base Cases:
-        
-        #All instances in dataSet are the same
-        if(self.dataSet.isPure()):
-            #gets the label of the first data instance and makes a leaf node
-            #classifying it. 
+        # Base Cases:
+
+        # All instances in dataSet are the same
+        if (self.dataSet.isPure()):
+            # gets the label of the first data instance and makes a leaf node
+            # classifying it.
             label = self.dataSet.getData()[0].getLabel()
             leaf = LeafNode(label)
             return leaf
-        #If there are no more features in the feature list
+        # If there are no more features in the feature list
         if len(self.featureList) == 0:
             labels = self.dataSet.getLabelStatistics()
             bestLabel = None
@@ -51,12 +52,12 @@ class TreeNode:
                 if labels[key] > mostTimes:
                     bestLabel = key
                     mostTimes = labels[key]
-            #Make the leaf node with the best label
+            # Make the leaf node with the best label
             leaf = LeafNode(bestLabel)
             return leaf
 
-        #Check all of the features for the split with the most 
-        #information gain. Use that split.
+        # Check all of the features for the split with the most
+        # information gain. Use that split.
         currentEntropy = self.dataSet.getEntropy()
         currentLength = self.dataSet.getLength()
         infoGain = -1 * sys.maxint
@@ -65,25 +66,26 @@ class TreeNode:
         bestRight = None
         bestThreshold = 0
 
-        #Feature Bagging, Random subspace
+        # Feature Bagging, Random subspace
         num = int(np.ceil(np.sqrt(len(self.featureList))))
         featureSubset = random.sample(self.featureList, num)
 
         for featureIndex in featureSubset:
-            #Calculate the threshold to use for that feature
+            # Calculate the threshold to use for that feature
             threshold = self.dataSet.betterThreshold(featureIndex)
 
             (leftSet, rightSet) = self.dataSet.splitOn(featureIndex, threshold)
 
             leftEntropy = leftSet.getEntropy()
             rightEntropy = rightSet.getEntropy()
-            #Weighted entropy for this split
-            newEntropy = (leftSet.getLength() / currentLength) * leftEntropy + (rightSet.getLength() / currentLength) * rightEntropy
-            #Calculate the gain for this test
+            # Weighted entropy for this split
+            newEntropy = (leftSet.getLength() / currentLength) * leftEntropy + (
+                        rightSet.getLength() / currentLength) * rightEntropy
+            # Calculate the gain for this test
             newIG = currentEntropy - newEntropy
 
-            if(newIG > infoGain):
-                #Update the best stuff
+            if (newIG > infoGain):
+                # Update the best stuff
                 infoGain = newIG
                 bestLeft = leftSet
                 bestRight = rightSet
@@ -93,7 +95,7 @@ class TreeNode:
         newFeatureList = list(self.featureList)
         newFeatureList.remove(bestFeature)
 
-        #Another base case, if there are no good features to split on
+        # Another base case, if there are no good features to split on
         if bestLeft.getLength() == 0 or bestRight.getLength() == 0:
             labels = self.dataSet.getLabelStatistics()
             bestLabel = None
@@ -103,7 +105,7 @@ class TreeNode:
                 if labels[key] > mostTimes:
                     bestLabel = key
                     mostTimes = labels[key]
-            #Make the leaf node with the best label
+            # Make the leaf node with the best label
             leaf = LeafNode(bestLabel)
             return leaf
 
@@ -117,13 +119,13 @@ class TreeNode:
         self.rightChild = rightChild.id3Train()
 
         return self
-        
+
     def __str__(self):
         return str(self.featureList)
 
     def __repr__(self):
         return self.__str__()
-                
+
     def classify(self, sample):
         '''
         Recursivly traverse the tree to classify the sample that is passed in. 
@@ -131,12 +133,12 @@ class TreeNode:
 
         value = sample.getFeatures()[self.featureNumber]
 
-        if(value < self.threshold):
-            #Continue down the left child    
+        if (value < self.threshold):
+            # Continue down the left child
             return self.leftChild.classify(sample)
 
         else:
-            #continue down the right child
+            # continue down the right child
             return self.rightChild.classify(sample)
 
 
@@ -150,8 +152,8 @@ class LeafNode:
         self.classification = classification
 
     def classify(self, sample):
-        #A leaf node simply is a classification, return that
-        #This is the base case of the classify recursive function for TreeNodes
+        # A leaf node simply is a classification, return that
+        # This is the base case of the classify recursive function for TreeNodes
         return self.classification
 
 
@@ -184,5 +186,3 @@ class ID3Tree:
         '''
 
         return self.rootNode.classify(sample)
-
-
