@@ -21,13 +21,13 @@ import gc
 
 '''
 一个简单的stacking实现
-第一层采用5种基于tree的算法：
+Stage1采用5种基于tree的算法：
 extraTree
 xgb
 rf
 catboost
 lgb
-第二层采用LR模型
+Stage2采用LR模型
 '''
 
 
